@@ -10,5 +10,5 @@ func main() {
 	var PORT = os.Getenv("PORT")
 
 	database.StartDB()
-	router.StartServer().Run(PORT)
+	router.StartServer().Run(":" + PORT)
 }

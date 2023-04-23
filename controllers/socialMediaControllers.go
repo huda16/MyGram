@@ -29,8 +29,10 @@ func GetSocialMedia(c *gin.Context) {
 	socialmediaId := c.Param("socialmediaId")
 
 	if socialmediaId != "" {
-		err := db.Where("id = ?", socialmediaId).Find(&socialMedia).Error
-		if err != nil {
+		result := db.Where("id = ?", socialmediaId).Find(&socialMedia)
+		err := result.Error
+		count := result.RowsAffected
+		if err != nil || count < 1 {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"err":     "Bad Request",
 				"message": "Invalid parameter",
@@ -49,6 +51,7 @@ func GetSocialMedia(c *gin.Context) {
 			"err":     "Bad Request",
 			"message": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, socialMedia)

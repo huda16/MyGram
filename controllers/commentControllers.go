@@ -29,8 +29,10 @@ func GetComment(c *gin.Context) {
 	commentId := c.Param("commentId")
 
 	if commentId != "" {
-		err := db.Where("id = ?", commentId).Find(&comments).Error
-		if err != nil {
+		result := db.Where("id = ?", commentId).Find(&comments)
+		err := result.Error
+		count := result.RowsAffected
+		if err != nil || count < 1 {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"err":     "Bad Request",
 				"message": "Invalid parameter",
@@ -49,6 +51,7 @@ func GetComment(c *gin.Context) {
 			"err":     "Bad Request",
 			"message": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, comments)

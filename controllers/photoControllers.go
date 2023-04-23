@@ -29,8 +29,10 @@ func GetPhoto(c *gin.Context) {
 	photoId := c.Param("photoId")
 
 	if photoId != "" {
-		err := db.Where("id = ?", photoId).Find(&photos).Error
-		if err != nil {
+		result := db.Where("id = ?", photoId).Find(&photos)
+		err := result.Error
+		count := result.RowsAffected
+		if err != nil || count < 1 {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"err":     "Bad Request",
 				"message": "Invalid parameter",
@@ -49,6 +51,7 @@ func GetPhoto(c *gin.Context) {
 			"err":     "Bad Request",
 			"message": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, photos)

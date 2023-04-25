@@ -32,10 +32,18 @@ func GetPhoto(c *gin.Context) {
 		result := db.Where("id = ?", photoId).Find(&photos)
 		err := result.Error
 		count := result.RowsAffected
-		if err != nil || count < 1 {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"err":     "Bad Request",
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error":   "Bad Request",
 				"message": "Invalid parameter",
+			})
+			return
+		}
+
+		if count < 1 {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"error":   "Data Not Found",
+				"message": "data doesn't exist",
 			})
 			return
 		}
@@ -47,8 +55,8 @@ func GetPhoto(c *gin.Context) {
 	err := db.Find(&photos).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return
@@ -90,8 +98,8 @@ func CreatePhoto(c *gin.Context) {
 	err := db.Debug().Create(&Photo).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return
@@ -136,8 +144,8 @@ func UpdatePhoto(c *gin.Context) {
 	err := db.Model(&Photo).Where("id = ?", photoId).Updates(models.Photo{Title: Photo.Title, Caption: Photo.Caption, PhotoUrl: Photo.PhotoUrl}).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return
@@ -168,8 +176,8 @@ func DeletePhoto(c *gin.Context) {
 	err := db.Where("id = ?", photoId).Delete(&Photo).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return

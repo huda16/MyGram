@@ -32,10 +32,18 @@ func GetSocialMedia(c *gin.Context) {
 		result := db.Where("id = ?", socialmediaId).Find(&socialMedia)
 		err := result.Error
 		count := result.RowsAffected
-		if err != nil || count < 1 {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"err":     "Bad Request",
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error":   "Bad Request",
 				"message": "Invalid parameter",
+			})
+			return
+		}
+
+		if count < 1 {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"error":   "Data Not Found",
+				"message": "data doesn't exist",
 			})
 			return
 		}
@@ -47,8 +55,8 @@ func GetSocialMedia(c *gin.Context) {
 	err := db.Find(&socialMedia).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return
@@ -90,8 +98,8 @@ func CreateSocialMedia(c *gin.Context) {
 	err := db.Debug().Create(&SocialMedia).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return
@@ -136,8 +144,8 @@ func UpdateSocialMedia(c *gin.Context) {
 	err := db.Model(&SocialMedia).Where("id = ?", socialmediaId).Updates(models.SocialMedia{Name: SocialMedia.Name, SocialMediaUrl: SocialMedia.SocialMediaUrl}).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return
@@ -168,8 +176,8 @@ func DeleteSocialMedia(c *gin.Context) {
 	err := db.Where("id = ?", socialmediaId).Delete(&SocialMedia).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return

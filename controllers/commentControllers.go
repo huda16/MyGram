@@ -32,10 +32,18 @@ func GetComment(c *gin.Context) {
 		result := db.Where("id = ?", commentId).Find(&comments)
 		err := result.Error
 		count := result.RowsAffected
-		if err != nil || count < 1 {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"err":     "Bad Request",
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error":   "Bad Request",
 				"message": "Invalid parameter",
+			})
+			return
+		}
+
+		if count < 1 {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"error":   "Data Not Found",
+				"message": "data doesn't exist",
 			})
 			return
 		}
@@ -47,8 +55,8 @@ func GetComment(c *gin.Context) {
 	err := db.Find(&comments).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return
@@ -90,8 +98,8 @@ func CreateComment(c *gin.Context) {
 	err := db.Debug().Create(&Comment).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return
@@ -135,8 +143,8 @@ func UpdateComment(c *gin.Context) {
 	err := db.Model(&Comment).Where("id = ?", commentId).Updates(models.Comment{PhotoID: Comment.PhotoID, Message: Comment.Message}).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return
@@ -167,8 +175,8 @@ func DeleteComment(c *gin.Context) {
 	err := db.Where("id = ?", commentId).Delete(&Comment).Error
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "Bad Request",
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad Request",
 			"message": err.Error(),
 		})
 		return
